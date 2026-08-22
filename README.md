@@ -1,2 +1,2 @@
 # temple-website
-Sri Narayana Samy Temple Website
+Sri Narayana Samy Temple
