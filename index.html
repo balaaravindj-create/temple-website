@@ -283,6 +283,85 @@ footer {
     <p>May Sri Narayana Samy's blessings be with everyone.</p>
     <p>© 2026 Sri Narayana Samy Temple</p>
 </footer>
+<!-- Automatic Temple Updates -->
+<section id="daily-updates" style="max-width:900px;margin:40px auto;padding:20px;">
+  <h2 style="text-align:center;color:#8b4513;">🙏 Daily Temple Updates</h2>
 
+  <div id="updates-container">
+    <p style="text-align:center;">Loading latest updates...</p>
+  </div>
+</section>
+
+<script>
+const SHEET_ID = "1-ADGqCm10InLEJVx-B9f3th7cqNS_Rl6XAu28fOqYnQ";
+const SHEET_NAME = "Sheet1";
+
+async function loadTempleUpdates() {
+  const container = document.getElementById("updates-container");
+
+  try {
+    const url =
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+    const response = await fetch(url);
+    const text = await response.text();
+
+    const json = JSON.parse(
+      text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1)
+    );
+
+    const rows = json.table.rows || [];
+
+    if (rows.length === 0) {
+      container.innerHTML =
+        '<p style="text-align:center;">No updates available.</p>';
+      return;
+    }
+
+    let html = "";
+
+    rows.slice().reverse().forEach(row => {
+      const date = row.c[0]?.v || "";
+      const title = row.c[1]?.v || "";
+      const update = row.c[2]?.v || "";
+
+      html += `
+        <div style="
+          background:#fff;
+          margin:15px 0;
+          padding:18px;
+          border-radius:12px;
+          box-shadow:0 3px 12px rgba(0,0,0,0.12);
+          border-left:5px solid #d4a017;
+        ">
+          <div style="font-size:14px;color:#777;margin-bottom:6px;">
+            📅 ${date}
+          </div>
+
+          <h3 style="margin:5px 0;color:#8b4513;">
+            ${title}
+          </h3>
+
+          <p style="margin:8px 0;line-height:1.6;">
+            ${update}
+          </p>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+  } catch (error) {
+    console.error("Google Sheet error:", error);
+    container.innerHTML =
+      '<p style="text-align:center;">Unable to load updates right now.</p>';
+  }
+}
+
+loadTempleUpdates();
+
+// Check for new updates every 5 minutes
+setInterval(loadTempleUpdates, 5 * 60 * 1000);
+</script>
 </body>
 </html>
